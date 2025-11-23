@@ -1,33 +1,23 @@
 import { useState } from "react";
-import { supabase } from "../api/supabase";
+import OrderInitiates from "./OrderInitiates";
+import Orders from "./Orders";
+
+
+
+
+
 
 function GiftCard() {
-  const [test, setTest] = useState("");
-  return (
-    <div>
-      <form
-        onSubmit={async (e) => {
-          e.preventDefault();
-          await fetch(
-            "https://ddvnuqohudlphhbsdtzg.supabase.co/functions/v1/rapid-handler",
-            {
-              method: "POST",
-              headers: { "content-type": "application/json" },
-              body: JSON.stringify({ test }),
-            }
-          );
-        }}
-      >
-        <input
-          onChange={(e) => {
-            setTest(e.target.value);
-          }}
-          type="text"
-        />
-        <button type="submit">ok</button>
-      </form>
-    </div>
-  );
+  const [view,setView] = useState(true)
+return (<main>
+  <nav><button style={{backgroundColor: view && 'var(--green-500)'}} onClick={()=>{setView(true)}} >Megerősített</button>
+   <button style ={{backgroundColor: !view && 'var(--green-500)'}} onClick={()=>{setView(false)}} >Kérelmek</button>
+   </nav>
+  
+  {view ? <Orders/>  : <OrderInitiates/> }
+  
+  
+</main>)
 }
 
 export default GiftCard;
