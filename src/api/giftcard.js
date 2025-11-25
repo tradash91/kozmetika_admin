@@ -23,6 +23,18 @@ export async function getOrders(rangeStart, rangeEnd) {
 export async function getNotifications() {
   let { data: notifications, error } = await supabase
     .from("notifications")
-    .select("*");
+    .select("*").eq('isNew',true);
   return notifications;
+}
+
+
+export async function updateNotification(id) {
+  
+  console.log('what')
+const { data, error } = await supabase
+  .from('notifications')
+  .update({ 'isNew': false })
+  .eq('order_id', id)
+  .select()
+  return data
 }

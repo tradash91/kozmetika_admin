@@ -12,6 +12,8 @@ import {
 import { useState } from "react";
 import styled from "styled-components";
 import { flex } from "../styles/GlobalStyles";
+import { getNotifications } from "../api/giftcard";
+import { useRealTimeNotifications } from "../hooks/useRealTimeNotifications";
 
 const StyledMain = styled.main`
   font-size: 16px;
@@ -120,7 +122,7 @@ function Settings() {
       console.log(error);
     },
   });
-
+ useRealTimeNotifications()
   if (
     isLoading ||
     isSocialLoading ||
@@ -149,6 +151,7 @@ function Settings() {
   return (
     <StyledMain>
       <h1>Nyitvatartás</h1>
+      
       <ul>
         {sortedData.map((data) => {
           return (

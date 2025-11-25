@@ -1,9 +1,11 @@
 import { useState } from "react";
 import OrderInitiates from "./OrderInitiates";
 import Orders from "./Orders";
+import { useRealTimeNotifications } from "../hooks/useRealTimeNotifications";
 
 function GiftCard({ notifications }) {
   const [view, setView] = useState(true);
+   useRealTimeNotifications()
   return (
     <main>
       <nav>

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { deletePost, getBlogPosts, uploadBlogPost } from "../api/Blog";
 import styled from "styled-components";
 import { flex } from "../styles/GlobalStyles";
+import { useRealTimeNotifications } from "../hooks/useRealTimeNotifications";
 const StyledPostsWrapper = styled.main`
   padding: 0 5rem;
 `;
@@ -113,6 +114,8 @@ function Blog() {
     mutate({ title, body, url });
     url = "";
   };
+
+ useRealTimeNotifications()
 
   if (isPending || isLoading || isImageUploading || isDeleting)
     return <h1>...Betöltés</h1>;

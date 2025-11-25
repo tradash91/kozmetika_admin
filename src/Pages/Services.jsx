@@ -15,6 +15,7 @@ import SubCategories from "../components/SubCategories";
 import SimpleAccordion from "../components/Accordion";
 import { StyledCreateMainCategory } from "../components/Subcategories.styles";
 import StatusIcon from "../components/StatusIcon";
+import { useRealTimeNotifications } from "../hooks/useRealTimeNotifications";
 
 function Services() {
   const [mainCategory, setMainCategory] = useState("");
@@ -65,6 +66,7 @@ function Services() {
       queryClient.invalidateQueries("getServices");
     },
   });
+  useRealTimeNotifications()
   if (
     isLoading ||
     isCreatingMainCategory ||

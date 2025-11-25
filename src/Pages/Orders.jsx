@@ -1,15 +1,19 @@
-import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
+import {  useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { getNotifications, getOrders } from "../api/giftcard";
+import { getNotifications, getOrders, updateNotification } from "../api/giftcard";
 import { StyledOrderInitiate } from "./gifcard.styles";
-import { number } from "motion";
 import { formatDate } from "../utils/formatData";
 import { supabase } from "../api/supabase";
+import { StyledNotificationIcon, StyledOrder } from "./orders.styles";
+import { useRealTimeNotifications } from "../hooks/useRealTimeNotifications";
 
-function Orders({ notifications }) {
+
+
+function Orders() {
   const [rangeStart, setRangeStart] = useState(0);
   const [rangeEnd, setRangeEnd] = useState(5);
   const [currActive, setCurrActive] = useState(0);
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ["getOrders", rangeStart, rangeEnd],
@@ -19,12 +23,19 @@ function Orders({ notifications }) {
     },
   });
 
-  const { data: nots, isLoading: loading } = useQuery({
+  const { data: notifications, isLoading: isNotificationsLoading } = useQuery({
     queryFn: getNotifications,
     queryKey: ["getNotifications"],
   });
-  const queryClient = useQueryClient();
-  useEffect(() => {
+
+  const {mutate:mutateUpdateNotification,isPending:isNotificationUpdating} = useMutation({
+    mutationFn: updateNotification,
+    onSuccess:()=>{
+      queryClient.invalidateQueries({queryKey:['getNotifications']})
+    }
+  })
+
+ /*  useEffect(() => {
     const channel = supabase
       .channel("notifications-realtime")
       .on(
@@ -34,7 +45,8 @@ function Orders({ notifications }) {
           console.log("Realtime változás:", payload);
 
           // ha új megrendelés jön → újra fetch
-          queryClient.invalidateQueries(["getNotifications"]);
+          queryClient.invalidateQueries({ queryKey: ["getNotifications"] });
+
         }
       )
       .subscribe();
@@ -42,18 +54,49 @@ function Orders({ notifications }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [queryClient]); */
 
-  if (isLoading) return <h1>...Betöltés</h1>;
+  useRealTimeNotifications()
+  useEffect(() => {
+    const channel = supabase
+      .channel("order-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "orders" },
+        (payload) => {
+          console.log("Realtime változás:", payload);
+
+          // ha új megrendelés jön → újra fetch
+          queryClient.invalidateQueries(["getOrders"]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [queryClient]);
+ 
+  if (isLoading|| isNotificationsLoading ) return <h1>...Betöltés</h1>;
 
   const pageCount = Math.ceil(data.count / 5);
-  console.log(notifications);
+  
   return (
     <div>
       {data.data.length === 0 && <h1>Jelenleg nincs megredelési kérelem.</h1>}
       {data.data.map((order, i) => {
+        
+        console.log(order);
+        
         return (
-          <StyledOrderInitiate key={i}>
+          <StyledOrder key={i} onClick={()=>{
+           
+             mutateUpdateNotification(order.order_id);
+          }} >
+            {notifications.map((notification,index)=>{
+              return notification.order_id === order.order_id && notification.isNew && <StyledNotificationIcon key={index} >!</StyledNotificationIcon>
+            })}
+            <p>{order.order_id}</p>
             <p>
               <span>Létrehozva: </span>
               {formatDate(order.created_at)}
@@ -74,7 +117,8 @@ function Orders({ notifications }) {
               <span>Cím: </span>
               {order.zip},{order.city},{order.street}
             </p>
-          </StyledOrderInitiate>
+            
+          </StyledOrder>
         );
       })}
       {Array.from({ length: Number(pageCount) }, (_, index) => {

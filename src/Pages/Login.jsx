@@ -32,7 +32,7 @@ function Login() {
   } = useMutation({
     mutationFn: ({ email, password }) => adminLogin({ email, password }),
     onSuccess: () => {
-      navigate("/admin/settings");
+      navigate("/admin");
       console.log("logged in");
     },
     onError: () => {

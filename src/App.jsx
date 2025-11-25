@@ -18,18 +18,14 @@ import Blog from "./Pages/Blog";
 import Services from "./Pages/Services";
 import GiftCard from "./Pages/GiftCard";
 import { getNotifications } from "./api/giftcard";
-import { h1 } from "motion/react-client";
 import { supabase } from "./api/supabase";
-import { NotificationsContext } from "./context/NotificationsContext";
+
 
 function App() {
   const [state, dispatch] = useReducer(reducer, initialState);
-
-  const { data: notifications, isLoading } = useQuery({
-    queryFn: getNotifications,
-    queryKey: ["getNotifications"],
-  });
   const queryClient = useQueryClient();
+
+ 
   useEffect(() => {
     const channel = supabase
       .channel("notifications-realtime")
@@ -40,7 +36,8 @@ function App() {
           console.log("Realtime változás:", payload);
 
           // ha új megrendelés jön → újra fetch
-          queryClient.invalidateQueries(["getNotifications"]);
+          queryClient.invalidateQueries({ queryKey: ["getNotifications"] });
+
         }
       )
       .subscribe();
@@ -48,14 +45,13 @@ function App() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [queryClient]);
 
-  if (isLoading) return <h1>...Betöltés</h1>;
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
       <GlobalStyles />
-      <NotificationsContext.Provider value={notifications}>
+      
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Login />} />
@@ -63,7 +59,7 @@ function App() {
               path="/admin"
               element={
                 <ProtectedRoute>
-                  <DashBoard notifications={notifications} />
+                  <DashBoard />
                 </ProtectedRoute>
               }
             >
@@ -72,12 +68,12 @@ function App() {
               <Route path="services" element={<Services />} />
               <Route
                 path="giftcard"
-                element={<GiftCard notifications={notifications} />}
+                element={<GiftCard />}
               />
             </Route>
           </Routes>
         </BrowserRouter>
-      </NotificationsContext.Provider>
+     
     </AppContext.Provider>
   );
 }

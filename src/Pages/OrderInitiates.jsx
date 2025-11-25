@@ -37,7 +37,7 @@ function OrderInitiates() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [queryClient]);
 
   if (isLoading) return <h1>...Betöltés</h1>;
 
