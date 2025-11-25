@@ -1,59 +1,95 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "../api/supabase";
-import { useQuery } from "@tanstack/react-query";
-import { getOrderInitiates} from "../api/giftcard";
+import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getOrderInitiates } from "../api/giftcard";
 import { StyledOrderInitiate } from "./gifcard.styles";
 
-function OrderInitiates () {
+function OrderInitiates() {
+  const [rangeStart, setRangeStart] = useState(0);
+  const [rangeEnd, setRangeEnd] = useState(4);
+  const [currActive, setCurrActive] = useState(0);
+  const btnArr = [];
+  let start = 0;
 
-
-  const [rangeStart,setRangeStart] = useState(0)
-  const [rangeEnd,setRangeEnd] = useState(4)
-  const [currActive,setCurrActive] = useState(0)
-  const btnArr = []
-  let start = 0
-  
-   const {data,isLoading}= useQuery({
-    queryKey:['getGiftCards',rangeStart,rangeEnd],
-    queryFn: ({queryKey})=>{
-      const [_,rangeStart,rangeEnd] = queryKey
-      return getOrderInitiates(rangeStart,rangeEnd)
+  const { data, isLoading } = useQuery({
+    queryKey: ["getGiftCards", rangeStart, rangeEnd],
+    queryFn: ({ queryKey }) => {
+      const [_, rangeStart, rangeEnd] = queryKey;
+      return getOrderInitiates(rangeStart, rangeEnd);
     },
-})
+  });
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    const channel = supabase
+      .channel("order-realtime")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "order_intents" },
+        (payload) => {
+          console.log("Realtime változás:", payload);
 
+          // ha új megrendelés jön → újra fetch
+          queryClient.invalidateQueries(["getGiftCards"]);
+        }
+      )
+      .subscribe();
 
-  if (isLoading) return <h1>...Betöltés</h1>
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
+  if (isLoading) return <h1>...Betöltés</h1>;
 
-for (let i = 0; i< data?.count;i++) {
-  btnArr.push(i)
-}
-const pageCount = Math.ceil(data.count / 4);
+  for (let i = 0; i < data?.count; i++) {
+    btnArr.push(i);
+  }
+  const pageCount = Math.ceil(data.count / 4);
 
-   return (
+  return (
     <div>
       {data.data.length === 0 && <h1>Jelenleg nincs megredelési kérelem.</h1>}
-      {data?.data.map((order,i)=>{
-      
-        
-        return <StyledOrderInitiate key={i}>
-          <p><span>Név: </span>{order.name}</p>
-          <p><span>Email: </span>{order.email}</p>
-          <p><span>Telefon: </span>{order.phone}</p>
-          <p><span>Cím: </span>{order.zip},{order.city},{order.street}</p>
-          
-        </StyledOrderInitiate>
+      {data?.data.map((order, i) => {
+        return (
+          <StyledOrderInitiate key={i}>
+            <p>
+              <span>Név: </span>
+              {order.name}
+            </p>
+            <p>
+              <span>Email: </span>
+              {order.email}
+            </p>
+            <p>
+              <span>Telefon: </span>
+              {order.phone}
+            </p>
+            <p>
+              <span>Cím: </span>
+              {order.zip},{order.city},{order.street}
+            </p>
+          </StyledOrderInitiate>
+        );
       })}
-      {Array.from({length:Number(pageCount)},(_,index)=>{
-            return <button style={{backgroundColor: currActive !== index? "#ffffff" : '#33a756'}}  onClick={()=>{
-              setCurrActive(index )
-              setRangeStart(index * 4)
-              setRangeEnd((index + 1) * 4)
-            }} key={index} >{index + 1}</button>
-          }) }
+      {Array.from({ length: Number(pageCount) }, (_, index) => {
+        return (
+          <button
+            style={{
+              backgroundColor: currActive !== index ? "#ffffff" : "#33a756",
+            }}
+            onClick={() => {
+              setCurrActive(index);
+              setRangeStart(index * 4);
+              setRangeEnd((index + 1) * 4);
+            }}
+            key={index}
+          >
+            {index + 1}
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-
-export default OrderInitiates
+export default OrderInitiates;

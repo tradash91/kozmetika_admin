@@ -1,8 +1,10 @@
 import { Link, Outlet } from "react-router";
 import styled from "styled-components";
 import { flex } from "../styles/GlobalStyles";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { logout } from "../api/apiAuth";
+import { getNotifications } from "../api/giftcard";
+import { useNotifications } from "../context/NotificationsContext";
 const StyledDashboardNav = styled.nav`
   ${flex("row")}
   gap: 5rem;
@@ -18,10 +20,12 @@ const StyledDashboardNav = styled.nav`
     }
   }
 `;
-function DashBoard() {
+function DashBoard({ notifications }) {
+  const nots = useNotifications();
   const { mutate } = useMutation({
     mutationFn: logout,
   });
+
   return (
     <div>
       <nav>
@@ -29,7 +33,9 @@ function DashBoard() {
           <Link to={"settings"}>Beállítások</Link>
           <Link to={"blog"}>Blog</Link>
           <Link to={"services"}>Szolgáltatások</Link>
-          <Link to={"giftcard"}>Ajándék kártyák</Link>
+          <Link to={"giftcard"}>
+            Ajándék kártyák <span>{nots.length}</span>
+          </Link>
           <Link
             style={{
               padding: "0 1rem",
