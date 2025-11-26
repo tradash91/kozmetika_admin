@@ -4,7 +4,7 @@ import { getNotifications, getOrders, updateNotification } from "../api/giftcard
 import { StyledOrderInitiate } from "./gifcard.styles";
 import { formatDate } from "../utils/formatData";
 import { supabase } from "../api/supabase";
-import { StyledNotificationIcon, StyledOrder } from "./orders.styles";
+import { StyledNotificationIcon, StyledOrder, StyledOrdersWrapper, StyledPagination } from "./orders.styles";
 import { useRealTimeNotifications } from "../hooks/useRealTimeNotifications";
 
 
@@ -17,6 +17,7 @@ function Orders() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["getOrders", rangeStart, rangeEnd],
+    staleTime:60,
     queryFn: ({ queryKey }) => {
       const [_, rangeStart, rangeEnd] = queryKey;
       return getOrders(rangeStart, rangeEnd);
@@ -35,47 +36,7 @@ function Orders() {
     }
   })
 
- /*  useEffect(() => {
-    const channel = supabase
-      .channel("notifications-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notifications" },
-        (payload) => {
-          console.log("Realtime változás:", payload);
-
-          // ha új megrendelés jön → újra fetch
-          queryClient.invalidateQueries({ queryKey: ["getNotifications"] });
-
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]); */
-
-  useRealTimeNotifications()
-  useEffect(() => {
-    const channel = supabase
-      .channel("order-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "orders" },
-        (payload) => {
-          console.log("Realtime változás:", payload);
-
-          // ha új megrendelés jön → újra fetch
-          queryClient.invalidateQueries(["getOrders"]);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
+ 
  
   if (isLoading|| isNotificationsLoading ) return <h1>...Betöltés</h1>;
 
@@ -83,10 +44,10 @@ function Orders() {
   
   return (
     <div>
-      {data.data.length === 0 && <h1>Jelenleg nincs megredelési kérelem.</h1>}
+      {data.data.length === 0 && <h1>Jelenleg nincs megredelés.</h1>}
       {data.data.map((order, i) => {
         
-        console.log(order);
+      
         
         return (
           <StyledOrder key={i} onClick={()=>{
@@ -117,15 +78,28 @@ function Orders() {
               <span>Cím: </span>
               {order.zip},{order.city},{order.street}
             </p>
+            <p>
+            <span>Szolgáltatás: </span>
+            {order.service}
+            </p>
+            <p><span>Ár: </span>
+            {order.service_price}
+              </p>
+            <p><span>Fizetve: </span>  
+             {order.isPaid ? ' Igen' : " Függőben"}
+            </p>
+            
             
           </StyledOrder>
         );
       })}
+      <StyledPagination>
       {Array.from({ length: Number(pageCount) }, (_, index) => {
         return (
           <button
             style={{
               backgroundColor: currActive !== index ? "#ffffff" : "#33a756",
+              color:currActive !== index ? "#1f1e1e" : "#fdfdfd"
             }}
             onClick={() => {
               setCurrActive(index);
@@ -138,6 +112,7 @@ function Orders() {
           </button>
         );
       })}
+      </StyledPagination>
       {/*  {btnArr.map((btn,i)=> {
             
             if(btn % 5 === 0) {

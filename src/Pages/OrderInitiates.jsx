@@ -3,6 +3,8 @@ import { supabase } from "../api/supabase";
 import { QueryClient, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getOrderInitiates } from "../api/giftcard";
 import { StyledOrderInitiate } from "./gifcard.styles";
+import { StyledOrder } from "./orders.styles";
+import { formatDate } from "../utils/formatData";
 
 function OrderInitiates() {
   const [rangeStart, setRangeStart] = useState(0);
@@ -13,12 +15,13 @@ function OrderInitiates() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["getGiftCards", rangeStart, rangeEnd],
+    staleTime:60,
     queryFn: ({ queryKey }) => {
       const [_, rangeStart, rangeEnd] = queryKey;
       return getOrderInitiates(rangeStart, rangeEnd);
     },
   });
-  const queryClient = useQueryClient();
+/*   const queryClient = useQueryClient();
   useEffect(() => {
     const channel = supabase
       .channel("order-realtime")
@@ -37,7 +40,7 @@ function OrderInitiates() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [queryClient]);
+  }, [queryClient]); */
 
   if (isLoading) return <h1>...Betöltés</h1>;
 
@@ -51,7 +54,12 @@ function OrderInitiates() {
       {data.data.length === 0 && <h1>Jelenleg nincs megredelési kérelem.</h1>}
       {data?.data.map((order, i) => {
         return (
-          <StyledOrderInitiate key={i}>
+          <StyledOrder key={i}>
+              <p>{order.order_id}</p>
+            <p>
+              <span>Létrehozva: </span>
+              {formatDate(order.created_at)}
+            </p>
             <p>
               <span>Név: </span>
               {order.name}
@@ -68,7 +76,14 @@ function OrderInitiates() {
               <span>Cím: </span>
               {order.zip},{order.city},{order.street}
             </p>
-          </StyledOrderInitiate>
+            <p>
+            <span>Szolgáltatás: </span>
+            {order.service}
+            </p>
+            <p><span>Ár: </span>
+            {order.service_price}
+              </p>
+          </StyledOrder>
         );
       })}
       {Array.from({ length: Number(pageCount) }, (_, index) => {
