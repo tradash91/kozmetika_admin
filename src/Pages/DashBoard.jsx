@@ -48,7 +48,6 @@ function DashBoard() {
  
  const { data: notifications,isLoading } = useQuery({
    queryKey: ["getNotifications"],
-   staleTime:50,
    queryFn: getNotifications,
   });
   
@@ -72,7 +71,7 @@ function DashBoard() {
           <div className="counterWrapper">
           <Link to={"giftcard"}>
             Ajándék kártyák 
-          {notifications?.length > 0 && <div className="counter">{ `${notifications?.length}`}</div>}
+          {notifications?.length > 0 && <div className="counter">{notifications?.length > 0 && `${notifications?.length}`}</div>}
           </Link>
           </div>
           <Link

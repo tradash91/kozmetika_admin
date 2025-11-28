@@ -117,7 +117,6 @@ function Blog() {
 
  useRealTimeNotifications()
 
-
   if (isPending || isLoading || isImageUploading || isDeleting)
     return <h1>...Betöltés</h1>;
   console.log(data);

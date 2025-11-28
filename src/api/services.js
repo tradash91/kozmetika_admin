@@ -25,8 +25,8 @@ export async function getServices() {
     console.error(error);
     return [];
   }
-const filteredData = data.sort((a,b)=>a.num-b.num)
-  return filteredData;
+
+  return data;
 }
 
 export async function createMainCategory({ name, bg_url, num }) {
