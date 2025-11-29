@@ -10,6 +10,7 @@ import {
   updateSettings,
 } from "../api/settings";
 import { useState } from "react";
+import LoadingPage from "../components/LoadingPage";
 
 function Admin() {
   const [time, setTime] = useState("");
@@ -91,7 +92,7 @@ function Admin() {
     isContactsLoading ||
     updatingContacts
   )
-    return <h1>...Loading</h1>;
+    return <LoadingPage/>;
   console.log(contactsData);
   const order = [
     "Hétfő",

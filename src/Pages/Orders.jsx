@@ -19,6 +19,7 @@ import {
 } from "./orders.styles";
 import { useRealTimeNotifications } from "../hooks/useRealTimeNotifications";
 import { button } from "motion/react-client";
+import LoadingPage from "../components/LoadingPage";
 
 function Orders() {
   const [rangeStart, setRangeStart] = useState(0);
@@ -71,12 +72,13 @@ function Orders() {
   });
 
   if (isLoading || isNotificationsLoading || isShippingStatusUpdating)
-    return <h1>...Betöltés</h1>;
+    return <LoadingPage/>;
 
   const pageCount = Math.ceil(data.count / 5);
 
   return (
     <div>
+      
       {data.data.length === 0 && <h1>Jelenleg nincs megredelés.</h1>}
       {data.data.map((order, i) => {
         return (

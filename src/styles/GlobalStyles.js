@@ -116,7 +116,9 @@ const GlobalStyles = createGlobalStyle`
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
+    @media  (max-width:780px) {
+      font-size: 55%;
+    }
     
   }
 

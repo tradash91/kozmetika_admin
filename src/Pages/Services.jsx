@@ -16,6 +16,7 @@ import SimpleAccordion from "../components/Accordion";
 import { StyledCreateMainCategory } from "../components/Subcategories.styles";
 import StatusIcon from "../components/StatusIcon";
 import { useRealTimeNotifications} from "../hooks/useRealTimeNotifications";
+import LoadingPage from "../components/LoadingPage";
 
 function Services() {
   const [mainCategory, setMainCategory] = useState("");
@@ -75,7 +76,7 @@ function Services() {
     isDeletingMainCategory ||
     isMainCategoryNameUpdating
   )
-    return <h1>...Loading</h1>;
+    return <LoadingPage/>;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -131,14 +132,15 @@ function Services() {
               <React.Fragment key={data.id}>
                 {isOpen !== data.id ? (
                   <li className={"categories"}>
-                    <p>
-                      <button
+                     <button
                         onClick={() => {
                           setIsOpen(data.id);
                         }}
                       >
                         Szerkesztés
                       </button>
+                    <p>
+                     
                       {data.name}
                       <StatusIcon color={data.isActive ? "green" : "red"} />
                     </p>

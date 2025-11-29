@@ -4,14 +4,21 @@ import { deletePost, getBlogPosts, uploadBlogPost } from "../api/Blog";
 import styled from "styled-components";
 import { flex } from "../styles/GlobalStyles";
 import { useRealTimeNotifications } from "../hooks/useRealTimeNotifications";
+import LoadingPage from "../components/LoadingPage";
 const StyledPostsWrapper = styled.main`
   padding: 0 5rem;
+  @media (max-width:780px) {
+    padding: 5rem 1rem;
+  }
 `;
 const StyledPosts = styled.div`
   ul {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 2rem;
+    @media (max-width:780px) {
+    ${flex('column')}
+  }
   }
 
   li {
@@ -119,7 +126,7 @@ function Blog() {
 
 
   if (isPending || isLoading || isImageUploading || isDeleting)
-    return <h1>...Betöltés</h1>;
+    return <LoadingPage/>;
   console.log(data);
   return (
     <StyledPostsWrapper>

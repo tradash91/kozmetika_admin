@@ -14,10 +14,14 @@ import styled from "styled-components";
 import { flex } from "../styles/GlobalStyles";
 import { getNotifications } from "../api/giftcard";
 import { useRealTimeNotifications } from "../hooks/useRealTimeNotifications";
+import LoadingPage from "../components/LoadingPage";
 
 const StyledMain = styled.main`
   font-size: 16px;
   padding: 2rem 4rem;
+   @media (max-width:780px) {
+               padding: 1rem 2rem;
+                  }
   p {
     font-size: 13px;
     strong {
@@ -30,9 +34,16 @@ const StyledMain = styled.main`
     word-wrap: break-word;
     gap: 2rem;
 
+  @media (max-width:780px) {
+    grid-template-columns: 100px 1fr ;
+    grid-template-rows: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
     p {
       background-color: #80808022;
       padding: 0 1rem;
+      word-wrap: break-word;
     }
 
     input {
@@ -43,6 +54,11 @@ const StyledMain = styled.main`
       color: var(--neutral-0);
       align-self: center;
       justify-self: center;
+        @media (max-width:780px) {
+          grid-row: 2;
+          grid-column:1/4 ;
+  }
+      
     }
   }
   ul {
@@ -133,7 +149,7 @@ function Settings() {
     isContactsLoading ||
     updatingContacts
   )
-    return <h1>...Loading</h1>;
+    return <LoadingPage/>;
 
   const order = [
     "Hétfő",

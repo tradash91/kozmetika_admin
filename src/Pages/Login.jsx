@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import styled from "styled-components";
 import { adminLogin } from "../api/apiAuth";
+import LoadingPage from "../components/LoadingPage";
 
 const StyledLoginForm = styled.form`
   display: flex;
@@ -46,7 +47,7 @@ function Login() {
     mutate({ email, password });
   }
 
-  if (isLoginLoading) return <h1>...Loading</h1>;
+  if (isLoginLoading) return <LoadingPage/>;
 
   return (
     <StyledLoginForm onSubmit={handleSubmit}>

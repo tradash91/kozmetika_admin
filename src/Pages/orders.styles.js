@@ -17,20 +17,26 @@ export const StyledOrder = styled.div`
 `;
 
 export const StyledNotificationIcon = styled.div`
-  background-color: green;
+  background-color: #509b50ff;
   ${flex("column")}
+  align-items: center;
+  justify-content: center;
   position: absolute;
-  width: 30px;
-  height: 30px;
+  width: 50px;
+  height: 50px;
   right: 40px;
   top: 20px;
   border-radius: 50%;
   color: white;
+  font-size: 25px;
+  font-weight: 600;
 `;
 
 export const StyledOrdersWrapper = styled.main`
   padding: 5rem;
+z-index: 1;
 
+display: block;
   div {
     padding-top: 1rem;
     h1 {

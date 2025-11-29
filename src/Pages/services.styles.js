@@ -5,10 +5,23 @@ export const StyledMainCategories = styled.ul`
   ${flex("row")}
   gap: 3rem;
   margin-top: 4rem;
+  @media (max-width:780px) {
+    flex-direction: column;
+  }
   .categories {
-    display: grid;
-    grid-template-rows: 60px 30px 150px 30px;
-
+    ${flex('column')}
+      gap: 1rem;
+    @media (max-width:780px) {
+    ${flex('column')}
+    gap: 2rem;
+    width: 100%;
+    &:after {
+      content: '';
+      width: 80%;
+      height: 3px;
+      background-color: #00000050;
+    }
+  }
     p {
       font-size: 18px;
       justify-self: center;
