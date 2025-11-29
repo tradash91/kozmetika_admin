@@ -4,12 +4,21 @@ import {
   getNotifications,
   getOrders,
   updateNotification,
+  updateOrderPaymentStatus,
+  updateShippingStatus,
 } from "../api/giftcard";
 import { StyledOrderInitiate } from "./gifcard.styles";
 import { formatDate } from "../utils/formatData";
 import { supabase } from "../api/supabase";
-import { StyledNotificationIcon, StyledOrder } from "./orders.styles";
+import {
+  StyledNotificationIcon,
+  StyledOrder,
+  StyledOrderButton,
+  StyledOrdersWrapper,
+  StyledPagination,
+} from "./orders.styles";
 import { useRealTimeNotifications } from "../hooks/useRealTimeNotifications";
+import { button } from "motion/react-client";
 
 function Orders() {
   const [rangeStart, setRangeStart] = useState(0);
@@ -19,6 +28,7 @@ function Orders() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["getOrders", rangeStart, rangeEnd],
+    staleTime: 60,
     queryFn: ({ queryKey }) => {
       const [_, rangeStart, rangeEnd] = queryKey;
       return getOrders(rangeStart, rangeEnd);
@@ -40,58 +50,35 @@ function Orders() {
     },
   });
 
-  /*  useEffect(() => {
-    const channel = supabase
-      .channel("notifications-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notifications" },
-        (payload) => {
-          console.log("Realtime változás:", payload);
+  const {
+    mutate: mutateUpdatePaymentStatus,
+    isPending: isPaymentStatusUpdating,
+  } = useMutation({
+    mutationFn: updateOrderPaymentStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getOrders"] });
+    },
+  });
 
-          // ha új megrendelés jön → újra fetch
-          queryClient.invalidateQueries({ queryKey: ["getNotifications"] });
+  const {
+    mutate: mutateUpdateShippingStatus,
+    isPending: isShippingStatusUpdating,
+  } = useMutation({
+    mutationFn: updateShippingStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["getOrders"] });
+    },
+  });
 
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]); */
-
-  useRealTimeNotifications();
-  useEffect(() => {
-    const channel = supabase
-      .channel("order-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "orders" },
-        (payload) => {
-          console.log("Realtime változás:", payload);
-
-          // ha új megrendelés jön → újra fetch
-          queryClient.invalidateQueries(["getOrders"]);
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
-
-  if (isLoading || isNotificationsLoading) return <h1>...Betöltés</h1>;
+  if (isLoading || isNotificationsLoading || isShippingStatusUpdating)
+    return <h1>...Betöltés</h1>;
 
   const pageCount = Math.ceil(data.count / 5);
 
   return (
     <div>
-      {data.data.length === 0 && <h1>Jelenleg nincs megredelési kérelem.</h1>}
+      {data.data.length === 0 && <h1>Jelenleg nincs megredelés.</h1>}
       {data.data.map((order, i) => {
-        console.log(order);
-
         return (
           <StyledOrder
             key={i}
@@ -128,28 +115,65 @@ function Orders() {
               <span>Cím: </span>
               {order.zip},{order.city},{order.street}
             </p>
-            <p>{order.service}</p>
-            <p>{order.service_price} Ft</p>
+            <p>
+              <span>Szolgáltatás: </span>
+              {order.service}
+            </p>
+            <p>
+              <span>Ár: </span>
+              {order.service_price}
+            </p>
+            <p>
+              <span>Fizetve: </span>
+              {order.isPaid ? " Igen" : " Függőben"}
+              {!order.isPaid && (
+                <StyledOrderButton
+                  onClick={() => {
+                    mutateUpdatePaymentStatus(order.order_id);
+
+                    console.log(order.order_id);
+                  }}
+                >
+                  Megjelölés fizetettként
+                </StyledOrderButton>
+              )}
+            </p>
+            <p>
+              <span>Szállítva: </span>
+              {order.isShipped ? " Igen" : " Függőben"}
+              {!order.isShipped && (
+                <StyledOrderButton
+                  onClick={() => {
+                    mutateUpdateShippingStatus(order.order_id);
+                  }}
+                >
+                  Megjelölés szállítottként
+                </StyledOrderButton>
+              )}
+            </p>
           </StyledOrder>
         );
       })}
-      {Array.from({ length: Number(pageCount) }, (_, index) => {
-        return (
-          <button
-            style={{
-              backgroundColor: currActive !== index ? "#ffffff" : "#33a756",
-            }}
-            onClick={() => {
-              setCurrActive(index);
-              setRangeStart(index * 5);
-              setRangeEnd((index + 1) * 5);
-            }}
-            key={index}
-          >
-            {index + 1}
-          </button>
-        );
-      })}
+      <StyledPagination>
+        {Array.from({ length: Number(pageCount) }, (_, index) => {
+          return (
+            <button
+              style={{
+                backgroundColor: currActive !== index ? "#ffffff" : "#33a756",
+                color: currActive !== index ? "#1f1e1e" : "#fdfdfd",
+              }}
+              onClick={() => {
+                setCurrActive(index);
+                setRangeStart(index * 5);
+                setRangeEnd((index + 1) * 5);
+              }}
+              key={index}
+            >
+              {index + 1}
+            </button>
+          );
+        })}
+      </StyledPagination>
       {/*  {btnArr.map((btn,i)=> {
             
             if(btn % 5 === 0) {

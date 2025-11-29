@@ -123,6 +123,7 @@ function Settings() {
     },
   });
  useRealTimeNotifications()
+ 
   if (
     isLoading ||
     isSocialLoading ||

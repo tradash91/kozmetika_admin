@@ -2,51 +2,53 @@ import styled from "styled-components";
 import { flex } from "../styles/GlobalStyles";
 import { style } from "motion/react-client";
 
-
-
 export const StyledOrder = styled.div`
-cursor: pointer;
-font-size: 14px;
-border-bottom: 1px solid #000;
-position: relative;
-padding: 1rem;
+  cursor: pointer;
+  font-size: 14px;
+  border-bottom: 1px solid #000;
+  position: relative;
+  padding: 1rem;
 
-p {
-    span{
-        font-weight: 500;
+  p {
+    span {
+      font-weight: 500;
     }
-}
-`
+  }
+`;
 
 export const StyledNotificationIcon = styled.div`
-background-color: green;
-${flex('column')}
-position: absolute;
-width: 30px;
-height: 30px;
-right: 40px;
-top: 20px;
-border-radius: 50%;
-color: white;
-`
+  background-color: green;
+  ${flex("column")}
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  right: 40px;
+  top: 20px;
+  border-radius: 50%;
+  color: white;
+`;
 
 export const StyledOrdersWrapper = styled.main`
-padding: 5rem;
+  padding: 5rem;
 
-div {
+  div {
     padding-top: 1rem;
     h1 {
-        text-align: center;
+      text-align: center;
     }
-}
-`
+  }
+`;
 
 export const StyledPagination = styled.nav`
-${flex('row')}
-align-items: center;
-font-size: 16px;
-width: 100%;
-gap: 1rem;
-padding: 3rem;
+  ${flex("row")}
+  align-items: center;
+  font-size: 16px;
+  width: 100%;
+  gap: 1rem;
+  padding: 3rem;
+`;
 
-`
+export const StyledOrderButton = styled.button`
+  background-color: #33a756;
+  color: var(--neutral-0);
+`;
