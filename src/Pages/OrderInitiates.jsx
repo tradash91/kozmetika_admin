@@ -55,7 +55,8 @@ function OrderInitiates() {
       {data?.data.map((order, i) => {
         return (
           <StyledOrder key={i}>
-            <p>{order.order_id}</p>
+           <div className="">
+             <p>{order.order_id}</p>
             <p>
               <span>Létrehozva: </span>
               {formatDate(order.created_at)}
@@ -84,6 +85,7 @@ function OrderInitiates() {
               <span>Ár: </span>
               {order.service_price}
             </p>
+           </div>
           </StyledOrder>
         );
       })}

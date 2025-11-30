@@ -8,28 +8,50 @@ export const StyledOrder = styled.div`
   border-bottom: 1px solid #000;
   position: relative;
   padding: 1rem;
-
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  
+  .nav {
+    ${flex('row')}
+    gap: 1rem;
+    align-self: start;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+  }
   p {
     span {
       font-weight: 500;
     }
+    align-self: start;
+  }
+  @media (max-width:780px) {
+    ${flex('column')}
   }
 `;
 
 export const StyledNotificationIcon = styled.div`
   background-color: #509b50ff;
-  ${flex("column")}
+  display: grid;
   align-items: center;
   justify-content: center;
   position: absolute;
   width: 50px;
   height: 50px;
   right: 40px;
-  top: 20px;
+  top: 50%;
   border-radius: 50%;
   color: white;
   font-size: 25px;
   font-weight: 600;
+  padding-top: 0 !important;
+   @media (max-width:780px) {
+   top: 5px;
+   right: 5px;
+   width: 20px;
+   height: 20px;
+   font-size: 12px;
+  }
 `;
 
 export const StyledOrdersWrapper = styled.main`
