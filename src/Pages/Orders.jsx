@@ -72,15 +72,15 @@ function Orders() {
   });
 
   if (isLoading || isNotificationsLoading || isShippingStatusUpdating)
-    return <LoadingPage/>;
+    return <LoadingPage />;
 
   const pageCount = Math.ceil(data.count / 5);
-
+  console.log(data);
   return (
     <div>
-      
       {data.data.length === 0 && <h1>Jelenleg nincs megredelés.</h1>}
       {data.data.map((order, i) => {
+        console.log(order);
         return (
           <StyledOrder
             key={i}
@@ -96,51 +96,54 @@ function Orders() {
                 )
               );
             })}
-           <div className="">
-             <p>{order.order_id}</p>
-            <p>
-              <span>Létrehozva: </span>
-              {formatDate(order.created_at)}
-            </p>
-            <p>
-              <span>Név: </span>
-              {order.name}
-            </p>
-            <p>
-              <span>Email: </span>
-              {order.email}
-            </p>
-            <p>
-              <span>Telefon: </span>
-              {order.phone}
-            </p>
-            <p>
-              <span>Cím: </span>
-              {order.zip},{order.city},{order.street}
-            </p>
-            <p>
-              <span>Szolgáltatás: </span>
-              {order.service}
-            </p>
-            <p>
-              <span>Ár: </span>
-              {order.service_price}
-            </p>
-              <p style={{color: order.isPaid ? 'green' : "red"}}>
-              <span>Fizetve: </span>
-              {order.isPaid ? " Igen" : " Függőben"}
-             
-            </p>
-            <p style={{color: order.isShipped ? 'green' : "red"}} >
-              <span>Szállítva: </span>
-              {order.isShipped ? " Igen" : " Függőben"}
-            
-            </p>
-           </div>
+            <div className="">
+              <p>{order.order_id}</p>
+              <p>
+                <span>Létrehozva: </span>
+                {formatDate(order.created_at)}
+              </p>
+              <p>
+                <span>Név: </span>
+                {order.name}
+              </p>
+              <p>
+                <span>Email: </span>
+                {order.email}
+              </p>
+              <p>
+                <span>Telefon: </span>
+                {order.phone}
+              </p>
+              <p>
+                <span>Cím: </span>
+                {order.zip},{order.city},{order.street}
+              </p>
+              <p>
+                <span>Szolgáltatás: </span>
+                {order.service}
+              </p>
+              <p>
+                <span>Szállítási mód: </span>
+                {order?.delivery}
+              </p>
+              <p>
+                <span>Ár: </span>
+                {order.service_price}
+              </p>
+              <p style={{ color: order.isPaid ? "green" : "red" }}>
+                <span>Fizetve: </span>
+                {order.isPaid ? " Igen" : " Függőben"}
+              </p>
+              {order.delivery === "posta" && (
+                <p style={{ color: order.isShipped ? "green" : "red" }}>
+                  <span>Szállítva: </span>
+                  {order.isShipped ? " Igen" : " Függőben"}
+                </p>
+              )}
+            </div>
             <div className="nav">
               {!order.isPaid && (
                 <StyledOrderButton
-                
                   onClick={() => {
                     mutateUpdatePaymentStatus(order.order_id);
 
@@ -150,7 +153,7 @@ function Orders() {
                   Megjelölés fizetettként
                 </StyledOrderButton>
               )}
-                {!order.isShipped && (
+              {!order.isShipped && order.delivery === "posta" && (
                 <StyledOrderButton
                   onClick={() => {
                     mutateUpdateShippingStatus(order.order_id);
@@ -160,7 +163,6 @@ function Orders() {
                 </StyledOrderButton>
               )}
             </div>
-           
           </StyledOrder>
         );
       })}
